@@ -1,18 +1,17 @@
-import { Modal, Form, Input, Button, Upload, message, DatePicker } from "antd";
-import React, { useState } from "react";
-import { useAddBannerMutation } from "../redux/api/metaDataApi";
-import dayjs from "dayjs";
+import { Button, DatePicker, Form, Input, Modal, Upload, message } from 'antd';
+import { useState } from 'react';
+import { useAddBannerMutation } from '../redux/api/metaDataApi';
 
 const AddBanner = ({ openAddModal, setOpenAddModal }) => {
   const [addBanner] = useAddBannerMutation();
   const [fileList, setFileList] = useState([]);
   const [form] = Form.useForm();
 
-  // Handle image upload
+  // Handle image upload-----------------------------
   const onChange = ({ fileList: newFileList }) => {
     setFileList(newFileList);
   };
-
+  // onPreview function to preview the uploaded image in a new window
   const onPreview = async (file) => {
     let src = file.url;
     if (!src) {
@@ -41,37 +40,31 @@ const AddBanner = ({ openAddModal, setOpenAddModal }) => {
       const formData = new FormData();
 
       fileList.forEach((file) => {
-        formData.append("banner", file.originFileObj);
+        formData.append('banner', file.originFileObj);
       });
 
       const data = {
-        startDate: values.startDate?.format("YYYY-MM-DD"),
-        endDate: values.endDate?.format("YYYY-MM-DD"),
+        startDate: values.startDate?.format('YYYY-MM-DD'),
+        endDate: values.endDate?.format('YYYY-MM-DD'),
         redirect_url: values.redirect_url,
       };
 
-      formData.append("data", JSON.stringify(data));
+      formData.append('data', JSON.stringify(data));
 
       const res = await addBanner(formData).unwrap();
 
-      message.success(res.message || "Banner added successfully!");
+      message.success(res.message || 'Banner added successfully!');
       setOpenAddModal(false);
       form.resetFields();
       setFileList([]);
     } catch (error) {
       console.error(error);
-      message.error(error?.data?.error || "Failed to add banner");
+      message.error(error?.data?.error || 'Failed to add banner');
     }
   };
 
   return (
-    <Modal
-      centered
-      open={openAddModal}
-      onCancel={handleCancel}
-      footer={null}
-      width={500}
-    >
+    <Modal centered open={openAddModal} onCancel={handleCancel} footer={null} width={500}>
       <div>
         <h1 className="text-center font-bold mb-4 text-lg">Add Banner</h1>
         <Form layout="vertical" form={form} onFinish={handleSubmit}>
@@ -79,7 +72,7 @@ const AddBanner = ({ openAddModal, setOpenAddModal }) => {
           <Form.Item
             label="Redirect URL"
             name="redirect_url"
-            rules={[{ required: true, message: "Please enter redirect URL" }]}
+            rules={[{ required: true, message: 'Please enter redirect URL' }]}
           >
             <Input placeholder="https://example.com" />
           </Form.Item>
@@ -89,34 +82,22 @@ const AddBanner = ({ openAddModal, setOpenAddModal }) => {
             <Form.Item
               label="Start Date"
               name="startDate"
-              rules={[{ required: true, message: "Please select start date" }]}
+              rules={[{ required: true, message: 'Please select start date' }]}
             >
-              <DatePicker
-                className="w-full"
-                format="DD/MM/YYYY"
-                placeholder="Select start date"
-              />
+              <DatePicker className="w-full" format="DD/MM/YYYY" placeholder="Select start date" />
             </Form.Item>
 
             <Form.Item
               label="End Date"
               name="endDate"
-              rules={[{ required: true, message: "Please select end date" }]}
+              rules={[{ required: true, message: 'Please select end date' }]}
             >
-              <DatePicker
-                className="w-full"
-                format="DD/MM/YYYY"
-                placeholder="Select end date"
-              />
+              <DatePicker className="w-full" format="DD/MM/YYYY" placeholder="Select end date" />
             </Form.Item>
           </div>
 
           {/* Upload */}
-          <Form.Item
-            label="Banner Image"
-            required
-            tooltip="Upload one banner image"
-          >
+          <Form.Item label="Banner Image" required tooltip="Upload one banner image">
             <Upload
               listType="picture-card"
               fileList={fileList}
@@ -124,25 +105,16 @@ const AddBanner = ({ openAddModal, setOpenAddModal }) => {
               onPreview={onPreview}
               maxCount={1}
             >
-              {fileList.length < 1 && "+ Upload"}
+              {fileList.length < 1 && '+ Upload'}
             </Upload>
           </Form.Item>
 
           {/* Actions */}
           <div className="w-full flex gap-3 mt-6">
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="bg-[#02111E] w-full"
-            >
+            <Button type="primary" htmlType="submit" className="bg-[#02111E] w-full">
               Save
             </Button>
-            <Button
-              danger
-              type="default"
-              className="w-full"
-              onClick={handleCancel}
-            >
+            <Button danger type="default" className="w-full" onClick={handleCancel}>
               Cancel
             </Button>
           </div>
