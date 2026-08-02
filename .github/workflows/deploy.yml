@@ -46,6 +46,6 @@ jobs:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USER: ${{ secrets.EC2_USER }}
         run: |
-          ssh $EC2_USER@$EC2_HOST "mkdir -p ~/applications/bartender_dashboard/dist"
-          rsync -avz dist/ $EC2_USER@$EC2_HOST:~/applications/bartender_dashboard/dist/
+          ssh $EC2_USER@$EC2_HOST "mkdir -p ~/applications/dashboard/dist"
+          rsync -avz dist/ $EC2_USER@$EC2_HOST:~/applications/dashboard/dist/
           ssh $EC2_USER@$EC2_HOST "sudo systemctl restart nginx"
