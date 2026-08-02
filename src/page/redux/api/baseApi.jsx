@@ -1,7 +1,7 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "http://10.10.28.196:5088",
+  baseUrl: 'https://api.preachradio.com',
   // prepareHeaders: (headers) => {
   //   const token = JSON.parse(localStorage.getItem("accessToken"));
   //   if (token) {
@@ -11,20 +11,20 @@ const baseQuery = fetchBaseQuery({
   // },
   prepareHeaders: (headers, { getState }) => {
     const accessToken = getState().logInUser.accessToken;
-    console.log("from baseApi", accessToken);
+    console.log('from baseApi', accessToken);
     if (accessToken) {
-      headers.set("authorization", `${accessToken}`);
+      headers.set('authorization', `${accessToken}`);
     }
     return headers;
   },
 });
 
 export const baseApi = createApi({
-  reducerPath: "baseApi",
+  reducerPath: 'baseApi',
   baseQuery: baseQuery,
-  tagTypes: ["overview", "host"],
+  tagTypes: ['overview', 'host'],
   endpoints: () => ({}),
 });
 
-export const imageUrl = "http://10.10.28.196:5088";
+export const imageUrl = 'https://api.preachradio.com';
 // asdfsf
