@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaArrowLeft, FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTrash } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import AddAlbum from "./AddAlbum";
 import { useGetAllAlbumQuery } from "../redux/api/productManageApi";
@@ -8,36 +8,6 @@ import { SearchOutlined } from "@ant-design/icons";
 import { Input, Pagination } from "antd";
 import { Navigate } from "../../Navigate";
 import { EyeIcon } from "lucide-react";
-const albums = [
-  {
-    _id: "68738b24f544e6f330c93066",
-    name: "Mindful Livingg",
-    description:
-      "A collection of podcasts focused on mindfulness, mental health, and wellness practices.",
-    tags: ["mindfulness", "wellness", "mental health"],
-    cover_image:
-      "https://d2dacdhzndo9w4.cloudfront.net/uploads/images/album_cover/1752402721679-shared_image.jpg",
-    podcasts: ["68734d681029b00d39a23d42"],
-    createdAt: "2025-07-13T10:32:04.340Z",
-    podcasts: [
-      "68734d681029b00d39a23d42",
-      "68734d681029b00d39a23d42",
-      "68734d681029b00d39a23d42",
-    ],
-  },
-  {
-    _id: "68738b24f544e6f330c93066",
-    name: "Mindful Livingg",
-    description:
-      "A collection of podcasts focused on mindfulness, mental health, and wellness practices.",
-    tags: ["mindfulness", "wellness", "mental health"],
-    cover_image:
-      "https://d2dacdhzndo9w4.cloudfront.net/uploads/images/album_cover/1752402721679-shared_image.jpg",
-    podcasts: ["68734d681029b00d39a23d42"],
-    createdAt: "2025-07-13T10:32:04.340Z",
-    podcasts: ["68734d681029b00d39a23d42", "68734d681029b00d39a23d42"],
-  },
-];
 
 const Album = () => {
   const [searchTerm, setSearchTerm] = useState("");

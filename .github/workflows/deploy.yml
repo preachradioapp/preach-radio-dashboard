@@ -19,7 +19,7 @@ jobs:
           node-version: '20.15'
 
       - name: Install Dependencies
-        run: npm install --frozen-lockfile
+        run: npm ci
 
       - name: Set environment variables from ENV_VARS_JSON
         env:
@@ -28,7 +28,9 @@ jobs:
           echo "$ENV_VARS_JSON" | jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]' >> $GITHUB_ENV
 
       - name: Build Vite Project
-        run: npx vite build
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+        run: npm run build
 
       - name: Set up SSH
         env:
