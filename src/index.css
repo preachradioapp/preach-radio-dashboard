@@ -2,193 +2,145 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Minimal reset (Tailwind preflight is disabled to avoid fighting antd). */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
+html,
+body,
+#root {
+  min-height: 100%;
+}
 
-/* table head color change */
-.custom-table .ant-table-thead > tr > th {
-  background-color: #fff1f1; /* slate-800 */
-  color: black;
+body {
+  margin: 0;
+  background: #f6f6f8;
+  color: #0f0f12;
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv11", "ss01";
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+img,
+video {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Native buttons must not show the browser's default gray background
+   (Tailwind preflight is off). antd buttons use class selectors and are unaffected. */
+button {
+  background-color: transparent;
+}
+
+/* Thin, unobtrusive scrollbars */
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+}
+.scroll-thin::-webkit-scrollbar {
+  width: 6px;
+}
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+}
+
+/* Table: tables live inside Surface panels, so drop antd's own outer radius */
+.ant-table-wrapper .ant-table {
+  border-radius: 0;
+}
+.ant-table-wrapper .ant-table-thead > tr > th {
+  font-size: 12px;
   font-weight: 600;
-  padding: 15px;
-}
-/* image upload folder design  */
-:where(
-    .css-dev-only-do-not-override-49qm
-  ).ant-upload-wrapper.ant-upload-picture-card-wrapper
-  .ant-upload.ant-upload-select,
-:where(
-    .css-dev-only-do-not-override-49qm
-  ).ant-upload-wrapper.ant-upload-picture-circle-wrapper
-  .ant-upload.ant-upload-select {
-  width: 100%;
-  height: 200px;
-  text-align: center;
-  vertical-align: top;
-  background-color: rgba(0, 0, 0, 0.02);
-  border: 1px dashed #d9d9d9;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: border-color 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-:where(.css-dev-only-do-not-override-49qm).ant-table-wrapper
-  .ant-table-thead
-  > tr
-  > th:not(:last-child):not(.ant-table-selection-column):not(
-    .ant-table-row-expand-icon-cell
-  ):not([colspan])::before,
-:where(.css-dev-only-do-not-override-49qm).ant-table-wrapper
-  .ant-table-thead
-  > tr
-  > td:not(:last-child):not(.ant-table-selection-column):not(
-    .ant-table-row-expand-icon-cell
-  ):not([colspan])::before {
-  position: absolute;
-  top: 50%;
-  inset-inline-end: 0;
-  width: 1px;
-  height: 1.6em;
-  background-color: #d8212100;
-  transform: translateY(-50%);
-  transition: background-color 0.2s;
-  content: "";
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-.children-menu {
+/* CMS editor (Jodit): match the dashboard's surfaces, no gray dead space */
+.cms-editor .jodit-container:not(.jodit_inline) {
+  border: 1px solid #e9e9ee;
+  border-radius: 12px;
   overflow: hidden;
-  transition: max-height 0.3s ease-out;
+  background: #fff;
+}
+.cms-editor .jodit-container .jodit-workplace,
+.cms-editor .jodit-wysiwyg {
+  background: #fff;
+}
+.cms-editor .jodit-toolbar__box:not(:empty) {
+  background: #fafafb;
+  border-bottom: 1px solid #e9e9ee;
+}
+.cms-editor .jodit-status-bar {
+  background: #fafafb;
+  border-top: 1px solid #f0f0f3;
+}
+.cms-editor .jodit-wysiwyg {
+  /* !important: Jodit writes its own inline min-height on this element */
+  min-height: 440px !important;
+  padding: 20px 24px !important;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #3f3f46;
+}
+.cms-editor .jodit-wysiwyg h1,
+.cms-editor .jodit-wysiwyg h2,
+.cms-editor .jodit-wysiwyg h3,
+.cms-editor .jodit-wysiwyg h4 {
+  color: #0f0f12;
+  line-height: 1.3;
+  margin: 1.1em 0 0.45em;
+}
+.cms-editor .jodit-wysiwyg h1 { font-size: 26px; }
+.cms-editor .jodit-wysiwyg h2 { font-size: 21px; }
+.cms-editor .jodit-wysiwyg h3 { font-size: 17px; }
+.cms-editor .jodit-wysiwyg p { margin: 0 0 0.9em; }
+.cms-editor .jodit-wysiwyg ul,
+.cms-editor .jodit-wysiwyg ol { padding-left: 1.5em; margin: 0 0 0.9em; }
+.cms-editor .jodit-wysiwyg a { color: #e63946; text-decoration: underline; }
+
+/* Rich text rendered from the CMS */
+.prose-content {
+  line-height: 1.7;
+  color: #3f3f46;
+}
+.prose-content h1,
+.prose-content h2,
+.prose-content h3 {
+  color: #0f0f12;
+  margin: 1.2em 0 0.5em;
+}
+.prose-content p {
+  margin: 0 0 1em;
+}
+.prose-content ul,
+.prose-content ol {
+  padding-left: 1.4em;
 }
 
-
-
-
-
-
-select option {
-  background-color: #EDC4C5;
-
-}
-
-
-
-
-
-
-.ant-table {
-  border: none !important;
-}
-
-.ant-table-container {
-  border: none !important;
-}
-
-.ant-table-thead > tr > th {
-  border: none !important;
-  background: #f5f5f5;
-}
-
-.ant-table-tbody > tr > td {
-  border: none !important;
-}
-
-.ant-pagination {
-  border: none !important;
-}
-
-
-
-
-
-
-.ant-pagination-item {
-  border-radius: 50% !important; 
-}
-
-
-.ant-pagination-item-active {
-  background-color: #D9000A !important; 
-  border-color: #D9000A !important;   
-}
-
-
-.ant-pagination-item-active > a {
-  color: white !important; 
-}
-
-
-
-
-
-
-.no-border-radius-modal .ant-modal {
-  border-radius: 0 !important;
-}
-
-
-
-
-
-
-:where(.css-dev-only-do-not-override-49qm).ant-checkbox-checked .ant-checkbox-inner {
-  background-color: #000000;
-  border-color: #000000;
-}
-
-
-
-:where(.css-dev-only-do-not-override-49qm).ant-tabs .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: #ff3916;
-  
-}
-
-
-
-
-.custom-tabs .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: red !important; 
-}
-
-.custom-tabs .ant-tabs-ink-bar {
-  background-color: red !important;
-}
-
-
-.custom-tabs .ant-tabs-tab:hover {
-  color: inherit !important; 
-}
-
-.custom-tabs .ant-tabs-tab-btn:hover {
-  color: inherit !important; 
-}
-
-
-.custom-tabs .ant-tabs-tab {
-  border-bottom: none !important; 
-}
-
-.custom-tabs .ant-tabs-tab-active {
-  border-bottom: 2px solid red !important; 
-}
-
-
-
-.no-scrollbar {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
-}
-
-.no-scrollbar::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
