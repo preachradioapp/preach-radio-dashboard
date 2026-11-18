@@ -13,9 +13,133 @@
       rel="stylesheet"
     />
     <title>Preach Radio · Admin</title>
+    <!--
+      Brand loader. Defined here (not in index.css) so the same loader shows the moment
+      the HTML arrives, before the app's JS/CSS have loaded. React reuses these classes
+      (PageLoader in src/components/ui/States.jsx) and replaces #root's content on render.
+    -->
+    <style>
+      .pr-loader {
+        display: grid;
+        place-items: center;
+        gap: 22px;
+        animation: pr-fade-in 0.45s ease-out 0.12s both;
+      }
+      .pr-loader--full {
+        position: fixed;
+        inset: 0;
+        background: #f6f6f8;
+        align-content: center;
+      }
+      .pr-loader--inline {
+        min-height: 50vh;
+        align-content: center;
+      }
+      .pr-loader__stage {
+        position: relative;
+        width: 132px;
+        height: 132px;
+        display: grid;
+        place-items: center;
+      }
+      .pr-loader__glow {
+        position: absolute;
+        inset: 18px;
+        border-radius: 32px;
+        background: radial-gradient(circle, rgba(230, 57, 70, 0.55), rgba(230, 57, 70, 0) 70%);
+        filter: blur(16px);
+        animation: pr-glow 2.4s ease-in-out infinite;
+      }
+      .pr-loader__ring {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        animation: pr-spin 1.6s cubic-bezier(0.5, 0.15, 0.5, 0.85) infinite;
+      }
+      .pr-loader__tile {
+        position: relative;
+        width: 92px;
+        height: 92px;
+        border-radius: 26px;
+        background: linear-gradient(160deg, #1a1a20 0%, #0b0b0e 70%);
+        box-shadow: 0 14px 34px -12px rgba(11, 11, 14, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        display: grid;
+        place-items: center;
+        animation: pr-breathe 2.4s ease-in-out infinite;
+      }
+      .pr-loader__tile img {
+        width: 76px;
+        height: auto;
+        display: block;
+      }
+      .pr-loader__wave {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        height: 18px;
+      }
+      .pr-loader__wave span {
+        width: 4px;
+        height: 100%;
+        border-radius: 4px;
+        background: #e63946;
+        transform-origin: center;
+        animation: pr-wave 1.1s ease-in-out infinite;
+      }
+      .pr-loader__wave span:nth-child(1) { animation-delay: -0.9s; opacity: 0.55; }
+      .pr-loader__wave span:nth-child(2) { animation-delay: -0.7s; opacity: 0.8; }
+      .pr-loader__wave span:nth-child(3) { animation-delay: -0.5s; }
+      .pr-loader__wave span:nth-child(4) { animation-delay: -0.3s; opacity: 0.8; }
+      .pr-loader__wave span:nth-child(5) { animation-delay: -0.1s; opacity: 0.55; }
+      .pr-loader--inline .pr-loader__stage { transform: scale(0.8); }
+
+      @keyframes pr-fade-in {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: none; }
+      }
+      @keyframes pr-spin {
+        to { transform: rotate(360deg); }
+      }
+      @keyframes pr-breathe {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.045); }
+      }
+      @keyframes pr-glow {
+        0%, 100% { opacity: 0.45; transform: scale(0.92); }
+        50% { opacity: 1; transform: scale(1.08); }
+      }
+      @keyframes pr-wave {
+        0%, 100% { transform: scaleY(0.3); }
+        50% { transform: scaleY(1); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .pr-loader__ring, .pr-loader__tile, .pr-loader__glow, .pr-loader__wave span {
+          animation: none !important;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="pr-loader pr-loader--full" role="status" aria-label="Loading">
+        <div class="pr-loader__stage">
+          <div class="pr-loader__glow"></div>
+          <svg class="pr-loader__ring" viewBox="0 0 132 132" aria-hidden="true">
+            <defs>
+              <linearGradient id="pr-ring-grad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#e63946" stop-opacity="0" />
+                <stop offset="1" stop-color="#e63946" />
+              </linearGradient>
+            </defs>
+            <circle cx="66" cy="66" r="62" fill="none" stroke="rgba(230,57,70,0.1)" stroke-width="3" />
+            <circle cx="66" cy="66" r="62" fill="none" stroke="url(#pr-ring-grad)" stroke-width="3" stroke-linecap="round" stroke-dasharray="120 270" />
+          </svg>
+          <div class="pr-loader__tile"><img src="/favicon.png" alt="Preach Radio" /></div>
+        </div>
+        <div class="pr-loader__wave" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
