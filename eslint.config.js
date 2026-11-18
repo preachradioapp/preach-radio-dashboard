@@ -3,10 +3,6 @@ import globals from 'globals'
 import react from 'eslint-plugin-react'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
-import { createRequire } from 'module';
-
-const require = createRequire(import.meta.url);
-
 export default [
   { ignores: ['dist'] },
   {
@@ -37,5 +33,10 @@ export default [
         { allowConstantExport: true },
       ],
     },
+  },
+  {
+    // Router config: lazy() page declarations, not hot-reloadable components.
+    files: ['src/routes/index.jsx'],
+    rules: { 'react-refresh/only-export-components': 'off' },
   },
 ];
