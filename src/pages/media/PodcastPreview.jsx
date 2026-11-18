@@ -45,7 +45,10 @@ const PodcastPreview = ({ podcastId, onClose }) => {
                 ? [{ key: "source", label: "Cut from", children: p.sourcePodcast?.title || "—", span: 2 }]
                 : []),
               { key: "dur", label: "Duration", children: podcastDurationLabel(p) },
-              { key: "views", label: "Plays", children: formatNumber(p.totalView) },
+              { key: "views", label: "Views", children: formatNumber(p.totalView ?? 0) },
+              { key: "likes", label: "Likes", children: formatNumber(p.totalLikes ?? 0) },
+              { key: "comments", label: "Comments", children: formatNumber(p.totalComments ?? 0) },
+              { key: "saves", label: "Saves", children: formatNumber(p.totalBookmarks ?? 0) },
               { key: "date", label: "Published", children: formatDate(p.createdAt) },
               { key: "addr", label: "Location", children: p.address || "—", span: 2 },
             ]}
