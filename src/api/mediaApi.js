@@ -29,6 +29,12 @@ export const mediaApi = baseApi.injectEndpoints({
       query: ({ id, status }) => ({ url: `/podcast/status/${id}`, method: "PATCH", body: { status } }),
       invalidatesTags: (r, e, { id }) => [{ type: TAGS.Podcast, id }, { type: TAGS.Podcast, id: "LIST" }],
     }),
+    /** Admin: convert (or re-convert) a podcast's media to HLS — e.g. after a failure. */
+    reprocessPodcast: build.mutation({
+      query: (id) => ({ url: `/podcast/reprocess/${id}`, method: "POST" }),
+      transformResponse: unwrapData,
+      invalidatesTags: (r, e, id) => [{ type: TAGS.Podcast, id }, { type: TAGS.Podcast, id: "LIST" }],
+    }),
     deletePodcast: build.mutation({
       query: (id) => ({ url: `/podcast/delete-podcast/${id}`, method: "DELETE" }),
       invalidatesTags: [{ type: TAGS.Podcast, id: "LIST" }, { type: TAGS.Album, id: "LIST" }, TAGS.Meta],
@@ -68,6 +74,7 @@ export const {
   useUpdatePodcastMutation,
   useDeletePodcastMutation,
   useSetPodcastStatusMutation,
+  useReprocessPodcastMutation,
   useGetPresignedUrlMutation,
   useGetStationQuery,
   useUpdateStationMutation,

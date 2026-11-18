@@ -6,6 +6,8 @@ import UserCell from "../../components/ui/UserCell";
 import { formatDate, formatNumber, podcastDurationLabel } from "../../lib/format";
 import { isVideoPodcast } from "../../lib/media";
 import CoverImage from "../../components/ui/CoverImage";
+import MediaPlayer from "../../components/MediaPlayer";
+import { ProcessingNotice } from "../../components/ProcessingBadge";
 
 /** Plays a podcast and shows its metadata. Fetches by id so it always shows fresh data. */
 const PodcastPreview = ({ podcastId, onClose }) => {
@@ -20,13 +22,21 @@ const PodcastPreview = ({ podcastId, onClose }) => {
       ) : (
         <div className="space-y-5">
           {isVideoPodcast(p) ? (
-            <video src={p.podcast_url} poster={p.coverImage || undefined} controls autoPlay className="aspect-video w-full rounded-xl bg-black" />
+            <MediaPlayer
+              kind="video"
+              src={p.podcast_url}
+              hlsUrl={p.hlsUrl || undefined}
+              poster={p.coverImage}
+              autoPlay
+              className="aspect-video w-full rounded-xl bg-black"
+            />
           ) : (
             <div className="flex items-center gap-4 rounded-xl bg-canvas p-4">
               <CoverImage src={p.coverImage} iconSize={28} className="h-24 w-24 shrink-0 rounded-lg object-cover" />
-              <audio src={p.podcast_url} controls autoPlay className="min-w-0 flex-1" />
+              <MediaPlayer kind="audio" src={p.podcast_url} hlsUrl={p.hlsUrl || undefined} autoPlay className="min-w-0 flex-1" />
             </div>
           )}
+          <ProcessingNotice podcast={p} />
           {(p.creator || p.station) && (
             <UserCell
               name={p.creator?.name || p.station?.name}

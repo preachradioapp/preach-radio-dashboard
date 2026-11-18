@@ -11,7 +11,7 @@ import { fromGeoPoint, locationRule, toGeoPoint } from "../../lib/geo";
 import { CLIP_MAX_SECONDS, isVideoPodcast } from "../../lib/media";
 import { useAction } from "../../hooks/useAction";
 import { useCategoryOptions } from "../../hooks/useCategoryOptions";
-import { readMediaDuration, useS3Upload } from "../../hooks/useS3Upload";
+import { readMediaInfo, useS3Upload } from "../../hooks/useS3Upload";
 import { buildFormData } from "../../lib/formData";
 import { formatDuration, toStoredDuration } from "../../lib/format";
 import { requiredText } from "../../lib/validation";
@@ -106,6 +106,7 @@ const PodcastFormModal = ({ open, podcast, onClose, type: pageType }) => {
             ...(coverUrl ? { coverImage: coverUrl } : {}),
             duration: toStoredDuration(media.seconds),
             durationSeconds: Math.round(media.seconds),
+            ...videoSize(kind, media),
           }),
           { success: isClip ? "Clip published" : "Podcast published" }
         );
@@ -134,6 +135,7 @@ const PodcastFormModal = ({ open, podcast, onClose, type: pageType }) => {
         changes.mediaType = kind;
         changes.duration = toStoredDuration(media.seconds);
         changes.durationSeconds = Math.round(media.seconds);
+        Object.assign(changes, videoSize(kind, media));
       }
       const newCover = cover instanceof File ? cover : null;
 
@@ -333,7 +335,11 @@ const PodcastFormModal = ({ open, podcast, onClose, type: pageType }) => {
   );
 };
 
-/** Bridges MediaFileInput into the form: reads duration when a file is picked. */
+/** Video size lets the server keep vertical clips sharp (it scales the short side). */
+const videoSize = (kind, media) =>
+  kind === "video" && media.width && media.height ? { videoWidth: media.width, videoHeight: media.height } : {};
+
+/** Bridges MediaFileInput into the form: reads duration and size when a file is picked. */
 const MediaFileField = ({ kind, value, onChange }) => (
   <MediaFileInput
     kind={kind}
@@ -341,8 +347,8 @@ const MediaFileField = ({ kind, value, onChange }) => (
     onPick={async (file) => {
       onChange?.({ file, seconds: undefined });
       try {
-        const seconds = await readMediaDuration(file);
-        onChange?.({ file, seconds: Number.isFinite(seconds) ? seconds : undefined });
+        const { seconds, width, height } = await readMediaInfo(file);
+        onChange?.({ file, seconds: Number.isFinite(seconds) ? seconds : undefined, width, height });
       } catch {
         onChange?.({ file, seconds: undefined });
       }

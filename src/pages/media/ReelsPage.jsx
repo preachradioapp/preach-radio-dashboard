@@ -10,7 +10,8 @@ import { EmptyState, ErrorState } from "../../components/ui/States";
 import Surface from "../../components/ui/Surface";
 import { useListParams } from "../../hooks/useListParams";
 import { formatNumber, podcastDurationLabel } from "../../lib/format";
-import { CLIP_MAX_SECONDS, isVideoPodcast } from "../../lib/media";
+import { CLIP_MAX_SECONDS, CONVERTING_POLL_MS, isConverting, isVideoPodcast } from "../../lib/media";
+import ProcessingBadge from "../../components/ProcessingBadge";
 import ClipPlayerModal from "./ClipPlayerModal";
 import PodcastActions from "./PodcastActions";
 import PodcastFormModal from "./PodcastFormModal";
@@ -91,11 +92,14 @@ const ClipCard = ({ clip, onOpen, onEdit }) => {
               <VolumeX size={11} /> Preview · click for sound
             </span>
           ) : (
-            hidden && (
-              <span className="inline-flex items-center gap-1 rounded-md bg-black/75 px-2 py-0.5 text-[11px] font-medium text-white">
-                <EyeOff size={11} /> Hidden
-              </span>
-            )
+            <span className="flex items-center gap-1.5">
+              <ProcessingBadge podcast={clip} overlay />
+              {hidden && (
+                <span className="inline-flex items-center gap-1 rounded-md bg-black/75 px-2 py-0.5 text-[11px] font-medium text-white">
+                  <EyeOff size={11} /> Hidden
+                </span>
+              )}
+            </span>
           )}
         </div>
         <div className="pointer-events-none absolute inset-x-3 bottom-3">
@@ -119,10 +123,15 @@ ClipCard.propTypes = { clip: PropTypes.object.isRequired, onOpen: PropTypes.func
 
 const ReelsPage = () => {
   const list = useListParams({ limit: 12, filters: { type: "clip", includeHidden: true, status: undefined } });
-  const { data, isLoading, isFetching, error, refetch } = useGetPodcastsQuery(list.queryArgs);
+  const [converting, setConverting] = useState(false);
+  const { data, isLoading, isFetching, error, refetch } = useGetPodcastsQuery(list.queryArgs, {
+    pollingInterval: converting ? CONVERTING_POLL_MS : 0,
+  });
   const [form, setForm] = useState({ open: false, podcast: undefined });
   const [playing, setPlaying] = useState(null); // index of the clip open in the player
   const clips = data?.result ?? [];
+  const anyConverting = clips.some(isConverting);
+  if (anyConverting !== converting) setConverting(anyConverting);
   const openCreate = () => setForm({ open: true, podcast: undefined });
   const openEdit = (podcast) => {
     setPlaying(null);
