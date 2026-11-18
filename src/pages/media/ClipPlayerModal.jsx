@@ -7,6 +7,7 @@ import UserCell from "../../components/ui/UserCell";
 import { formatDate, formatNumber, podcastDurationLabel } from "../../lib/format";
 import { isVideoPodcast } from "../../lib/media";
 import PodcastActions from "./PodcastActions";
+import CoverImage from "../../components/ui/CoverImage";
 
 const Stat = ({ icon: Icon, label, value, loading }) => (
   <div className="rounded-xl border border-line-soft bg-canvas px-3 py-2.5">
@@ -88,7 +89,7 @@ const ClipPlayerModal = ({ clips, index, onIndexChange, onClose, onEdit }) => {
             <video
               key={clip._id}
               src={clip.podcast_url}
-              poster={clip.coverImage}
+              poster={clip.coverImage || undefined}
               controls
               autoPlay
               playsInline
@@ -96,7 +97,7 @@ const ClipPlayerModal = ({ clips, index, onIndexChange, onClose, onEdit }) => {
             />
           ) : (
             <div key={clip._id} className="flex w-full flex-col items-center gap-5 p-6">
-              <img src={clip.coverImage} alt="" className="aspect-square w-full max-w-[300px] rounded-xl object-cover" />
+              <CoverImage src={clip.coverImage} iconSize={48} className="aspect-square w-full max-w-[300px] rounded-xl object-cover" />
               <audio src={clip.podcast_url} controls autoPlay className="w-full" />
             </div>
           )}

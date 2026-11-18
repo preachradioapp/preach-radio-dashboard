@@ -13,6 +13,7 @@ import { isVideoPodcast } from "../../lib/media";
 import PodcastActions from "./PodcastActions";
 import PodcastFormModal from "./PodcastFormModal";
 import PodcastPreview from "./PodcastPreview";
+import CoverImage from "../../components/ui/CoverImage";
 
 const PodcastsPage = () => {
   // Full episodes only (clips live on the Reels page). Admins also see hidden ones.
@@ -78,10 +79,9 @@ const PodcastsPage = () => {
                   className="relative block aspect-video w-full overflow-hidden border-0 bg-canvas p-0"
                   aria-label={`Play ${p.title}`}
                 >
-                  <img
+                  <CoverImage
                     src={p.coverImage}
-                    alt=""
-                    loading="lazy"
+                    iconSize={32}
                     className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
                   />
                   <span className="absolute inset-0 grid place-items-center bg-black/0 transition group-hover:bg-black/30">

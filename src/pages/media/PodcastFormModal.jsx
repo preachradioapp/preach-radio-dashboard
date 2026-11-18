@@ -14,7 +14,7 @@ import { useCategoryOptions } from "../../hooks/useCategoryOptions";
 import { readMediaDuration, useS3Upload } from "../../hooks/useS3Upload";
 import { buildFormData } from "../../lib/formData";
 import { formatDuration, toStoredDuration } from "../../lib/format";
-import { requiredImage, requiredText } from "../../lib/validation";
+import { requiredText } from "../../lib/validation";
 import MediaFileInput from "./MediaFileInput";
 
 const sameArray = (a = [], b = []) => a.length === b.length && a.every((v, i) => v === b[i]);
@@ -89,8 +89,12 @@ const PodcastFormModal = ({ open, podcast, onClose, type: pageType }) => {
       }
 
       if (!isEdit) {
-        setProgress({ label: "Uploading cover", percent: 0 });
-        const coverUrl = await upload(cover, "podcast_cover", (percent) => setProgress({ label: "Uploading cover", percent }));
+        // The cover is optional: without one the apps show a placeholder (or the video's first frame).
+        let coverUrl;
+        if (cover instanceof File) {
+          setProgress({ label: "Uploading cover", percent: 0 });
+          coverUrl = await upload(cover, "podcast_cover", (percent) => setProgress({ label: "Uploading cover", percent }));
+        }
         setProgress({ label: "Publishing", percent: 100 });
         const res = await run(
           createPodcast({
@@ -99,7 +103,7 @@ const PodcastFormModal = ({ open, podcast, onClose, type: pageType }) => {
             ...(isClip && sourcePodcast ? { sourcePodcast } : {}),
             podcast_url: mediaUrl,
             mediaType: kind,
-            coverImage: coverUrl,
+            ...(coverUrl ? { coverImage: coverUrl } : {}),
             duration: toStoredDuration(media.seconds),
             durationSeconds: Math.round(media.seconds),
           }),
@@ -233,7 +237,7 @@ const PodcastFormModal = ({ open, podcast, onClose, type: pageType }) => {
                 );
               }}
             </Form.Item>
-            <Form.Item name="cover" label="Cover" rules={[requiredImage("A cover image")]}>
+            <Form.Item name="cover" label={<span>Cover <span className="font-normal text-muted">(optional)</span></span>}>
               <ImageUpload aspect="aspect-square" hint="Square, 1400px+" />
             </Form.Item>
           </div>

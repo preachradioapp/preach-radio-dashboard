@@ -14,6 +14,7 @@ import { CLIP_MAX_SECONDS, isVideoPodcast } from "../../lib/media";
 import ClipPlayerModal from "./ClipPlayerModal";
 import PodcastActions from "./PodcastActions";
 import PodcastFormModal from "./PodcastFormModal";
+import CoverImage from "../../components/ui/CoverImage";
 
 const CardStat = ({ icon: Icon, value, label }) => (
   <span className="inline-flex items-center gap-1 tabular-nums" title={`${formatNumber(value ?? 0)} ${label}`}>
@@ -51,9 +52,19 @@ const ClipCard = ({ clip, onOpen, onEdit }) => {
     <article className={`flex flex-col overflow-hidden rounded-2xl bg-white shadow-card transition hover:shadow-lift ${hidden ? "outline-dashed outline-1 outline-zinc-300" : ""}`}>
       <div className="group relative aspect-[9/16] overflow-hidden bg-black" onMouseEnter={isVideo ? startPreview : undefined} onMouseLeave={isVideo ? stopPreview : undefined}>
         {isVideo ? (
-          <video ref={ref} src={clip.podcast_url} poster={clip.coverImage} preload="none" muted loop playsInline className="h-full w-full object-cover" />
+          <video
+            ref={ref}
+            // No cover: load just the metadata so the first frame works as the thumbnail.
+            src={clip.coverImage ? clip.podcast_url : `${clip.podcast_url}#t=0.1`}
+            poster={clip.coverImage || undefined}
+            preload={clip.coverImage ? "none" : "metadata"}
+            muted
+            loop
+            playsInline
+            className="h-full w-full object-cover"
+          />
         ) : (
-          <img src={clip.coverImage} alt="" loading="lazy" className="h-full w-full object-cover" />
+          <CoverImage src={clip.coverImage} iconSize={40} className="h-full w-full object-cover" />
         )}
         <button
           type="button"

@@ -13,6 +13,7 @@ import { EmptyState, ErrorState } from "../../components/ui/States";
 import { useAction } from "../../hooks/useAction";
 import { formatNumber, fromNow } from "../../lib/format";
 import GrowthChart from "./GrowthChart";
+import CoverImage from "../../components/ui/CoverImage";
 
 const greeting = () => {
   const h = new Date().getHours();
@@ -94,7 +95,7 @@ const LatestPodcasts = () => {
           renderItem={(p) => (
             <List.Item className="!px-0">
               <div className="flex min-w-0 flex-1 items-center gap-3">
-                <img src={p.coverImage} alt="" loading="lazy" className="h-11 w-11 shrink-0 rounded-lg bg-canvas object-cover" />
+                <CoverImage src={p.coverImage} iconSize={16} className="h-11 w-11 shrink-0 rounded-lg bg-canvas object-cover" />
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-medium text-ink">{p.title}</div>
                   <div className="truncate text-xs text-muted">
