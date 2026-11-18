@@ -1,6 +1,8 @@
 import PropTypes from "prop-types";
-import { Button, Skeleton, Spin } from "antd";
+import { useId } from "react";
+import { Button, Skeleton } from "antd";
 import { AlertTriangle, Inbox, RotateCw } from "lucide-react";
+import logo from "../../assets/header/logo.png";
 import { getErrorMessage } from "../../lib/errors";
 
 export const EmptyState = ({ title = "Nothing here yet", description, action, icon: Icon = Inbox }) => (
@@ -42,11 +44,41 @@ ErrorState.propTypes = {
   title: PropTypes.node,
 };
 
-export const PageLoader = ({ fullScreen = false }) => (
-  <div className={`grid place-items-center ${fullScreen ? "h-screen" : "min-h-[50vh]"}`}>
-    <Spin size="large" />
-  </div>
-);
+/**
+ * Brand loader: the logo on a dark tile inside a spinning ring, with a radio wave below.
+ * Styles live in index.html so the identical loader also shows before the app's JS loads.
+ * It fades in after a short delay, so fast loads don't flash it.
+ */
+export const PageLoader = ({ fullScreen = false }) => {
+  const gradientId = useId();
+  return (
+    <div className={`pr-loader ${fullScreen ? "pr-loader--full" : "pr-loader--inline"}`} role="status" aria-label="Loading">
+      <div className="pr-loader__stage">
+        <div className="pr-loader__glow" />
+        <svg className="pr-loader__ring" viewBox="0 0 132 132" aria-hidden="true">
+          <defs>
+            <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stopColor="#e63946" stopOpacity="0" />
+              <stop offset="1" stopColor="#e63946" />
+            </linearGradient>
+          </defs>
+          <circle cx="66" cy="66" r="62" fill="none" stroke="rgba(230,57,70,0.1)" strokeWidth="3" />
+          <circle cx="66" cy="66" r="62" fill="none" stroke={`url(#${gradientId})`} strokeWidth="3" strokeLinecap="round" strokeDasharray="120 270" />
+        </svg>
+        <div className="pr-loader__tile">
+          <img src={logo} alt="Preach Radio" />
+        </div>
+      </div>
+      <div className="pr-loader__wave" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+        <span />
+        <span />
+      </div>
+    </div>
+  );
+};
 
 PageLoader.propTypes = { fullScreen: PropTypes.bool };
 
