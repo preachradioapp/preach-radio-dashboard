@@ -38,15 +38,18 @@ export const useS3Upload = () => {
   );
 };
 
-/** Reads duration (seconds) from a local audio/video file's metadata. */
-export const readMediaDuration = (file) =>
+/**
+ * Reads a local audio/video file's metadata: duration in seconds and, for video,
+ * the size as displayed (browsers apply the rotation flag of phone videos).
+ */
+export const readMediaInfo = (file) =>
   new Promise((resolve, reject) => {
     const el = document.createElement(file.type.startsWith("video") ? "video" : "audio");
     const url = URL.createObjectURL(file);
     el.preload = "metadata";
     el.onloadedmetadata = () => {
       URL.revokeObjectURL(url);
-      resolve(el.duration);
+      resolve({ seconds: el.duration, width: el.videoWidth || undefined, height: el.videoHeight || undefined });
     };
     el.onerror = () => {
       URL.revokeObjectURL(url);
@@ -54,3 +57,6 @@ export const readMediaDuration = (file) =>
     };
     el.src = url;
   });
+
+/** Reads duration (seconds) from a local audio/video file's metadata. */
+export const readMediaDuration = async (file) => (await readMediaInfo(file)).seconds;
