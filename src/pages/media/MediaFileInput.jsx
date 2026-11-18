@@ -52,16 +52,16 @@ const MediaFileInput = ({ kind, value, onPick }) => {
   }
 
   return (
-    <div className="flex min-h-[220px] flex-col justify-center rounded-xl border border-line p-3">
+    <div className="flex min-h-[220px] min-w-0 flex-col justify-center overflow-hidden rounded-xl border border-line p-3">
       {kind === "video" ? (
-        <video src={previewUrl} controls preload="metadata" className="max-h-36 w-full rounded-lg bg-black" />
+        <video src={previewUrl} controls preload="metadata" className="max-h-36 w-full rounded-lg bg-black object-contain" />
       ) : (
         <audio src={previewUrl} controls preload="metadata" className="w-full" />
       )}
       <div className="mt-3 flex items-center gap-3">
         <Icon size={18} className="shrink-0 text-muted" />
         <div className="min-w-0 flex-1 text-sm">
-          <div className="truncate font-medium text-ink">{value.file?.name || "Current file"}</div>
+          <div className="truncate font-medium text-ink" title={value.file?.name}>{value.file?.name || "Current file"}</div>
           <div className="text-xs text-muted">
             {value.file && `${(value.file.size / 1024 / 1024).toFixed(1)} MB · `}
             {value.seconds ? formatDuration(value.seconds) : value.file ? "Reading duration…" : "Uploaded"}

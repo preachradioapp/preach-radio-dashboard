@@ -4,6 +4,8 @@ import { ImagePlus, X } from "lucide-react";
 import { useEffect, useMemo } from "react";
 
 const MAX_MB = 5;
+// Must match the backend upload filter (helper/mutler-s3-uploader.ts): anything else is rejected there.
+const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 /**
  * Controlled single-image picker that works as an antd Form field.
@@ -25,8 +27,8 @@ const ImageUpload = ({ value, onChange, aspect = "aspect-video", hint = `PNG, JP
   );
 
   const beforeUpload = (file) => {
-    if (!file.type.startsWith("image/")) {
-      message.error("Please choose an image file.");
+    if (!ACCEPTED_TYPES.includes(file.type)) {
+      message.error("Please choose a PNG, JPG or WEBP image.");
       return Upload.LIST_IGNORE;
     }
     if (file.size / 1024 / 1024 > MAX_MB) {
@@ -40,7 +42,7 @@ const ImageUpload = ({ value, onChange, aspect = "aspect-video", hint = `PNG, JP
   return (
     <div className={`group relative w-full overflow-hidden rounded-xl ${aspect}`}>
       <Upload.Dragger
-        accept="image/*"
+        accept={ACCEPTED_TYPES.join(",")}
         showUploadList={false}
         beforeUpload={beforeUpload}
         className="!absolute inset-0 block h-full [&_.ant-upload-btn]:!p-0 [&_.ant-upload-drag]:!h-full [&_.ant-upload-drag]:!rounded-xl [&_.ant-upload-drag]:overflow-hidden"
