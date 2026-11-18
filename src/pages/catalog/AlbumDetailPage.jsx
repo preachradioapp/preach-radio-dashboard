@@ -11,6 +11,7 @@ import { useAction } from "../../hooks/useAction";
 import { formatDate, pluralize } from "../../lib/format";
 import PodcastPreview from "../media/PodcastPreview";
 import AlbumFormModal from "./AlbumFormModal";
+import CoverImage from "../../components/ui/CoverImage";
 
 const AlbumDetailPage = () => {
   const { id } = useParams();
@@ -93,7 +94,7 @@ const AlbumDetailPage = () => {
                 >
                   <div className="flex min-w-0 items-center gap-3">
                     <span className="w-6 text-right text-sm tabular-nums text-muted">{i + 1}</span>
-                    <img src={p.coverImage} alt="" loading="lazy" className="h-11 w-11 rounded-lg bg-canvas object-cover" />
+                    <CoverImage src={p.coverImage} iconSize={16} className="h-11 w-11 shrink-0 rounded-lg bg-canvas object-cover" />
                     <div className="min-w-0">
                       <div className="truncate font-medium text-ink">{p.title}</div>
                       <div className="truncate text-xs text-muted">

@@ -5,6 +5,7 @@ import { ErrorState } from "../../components/ui/States";
 import UserCell from "../../components/ui/UserCell";
 import { formatDate, formatNumber, podcastDurationLabel } from "../../lib/format";
 import { isVideoPodcast } from "../../lib/media";
+import CoverImage from "../../components/ui/CoverImage";
 
 /** Plays a podcast and shows its metadata. Fetches by id so it always shows fresh data. */
 const PodcastPreview = ({ podcastId, onClose }) => {
@@ -19,10 +20,10 @@ const PodcastPreview = ({ podcastId, onClose }) => {
       ) : (
         <div className="space-y-5">
           {isVideoPodcast(p) ? (
-            <video src={p.podcast_url} poster={p.coverImage} controls autoPlay className="aspect-video w-full rounded-xl bg-black" />
+            <video src={p.podcast_url} poster={p.coverImage || undefined} controls autoPlay className="aspect-video w-full rounded-xl bg-black" />
           ) : (
             <div className="flex items-center gap-4 rounded-xl bg-canvas p-4">
-              <img src={p.coverImage} alt="" className="h-24 w-24 rounded-lg object-cover" />
+              <CoverImage src={p.coverImage} iconSize={28} className="h-24 w-24 shrink-0 rounded-lg object-cover" />
               <audio src={p.podcast_url} controls autoPlay className="min-w-0 flex-1" />
             </div>
           )}
