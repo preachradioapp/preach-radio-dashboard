@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Button, Pagination } from "antd";
-import { AudioLines, Clapperboard, Eye, EyeOff, Pause, Play, Plus } from "lucide-react";
+import { AudioLines, Clapperboard, Eye, EyeOff, Heart, MessageCircle, Play, Plus, VolumeX } from "lucide-react";
 import { useGetPodcastsQuery } from "../../api/mediaApi";
 import PageHeader from "../../components/ui/PageHeader";
 import SearchInput from "../../components/ui/SearchInput";
@@ -11,72 +11,89 @@ import Surface from "../../components/ui/Surface";
 import { useListParams } from "../../hooks/useListParams";
 import { formatNumber, podcastDurationLabel } from "../../lib/format";
 import { CLIP_MAX_SECONDS, isVideoPodcast } from "../../lib/media";
+import ClipPlayerModal from "./ClipPlayerModal";
 import PodcastActions from "./PodcastActions";
 import PodcastFormModal from "./PodcastFormModal";
 
-/** A clip only fetches its media when the admin hovers or taps it. */
-const ClipCard = ({ clip, onEdit }) => {
+const CardStat = ({ icon: Icon, value, label }) => (
+  <span className="inline-flex items-center gap-1 tabular-nums" title={`${formatNumber(value ?? 0)} ${label}`}>
+    <Icon size={12} /> {formatNumber(value ?? 0)}
+  </span>
+);
+
+CardStat.propTypes = { icon: PropTypes.elementType.isRequired, value: PropTypes.number, label: PropTypes.string.isRequired };
+
+/**
+ * Hovering a video clip plays a silent preview (browsers only allow sound after a click).
+ * Clicking opens the player with sound, controls and stats. Media loads only on hover/click.
+ */
+const ClipCard = ({ clip, onOpen, onEdit }) => {
   const ref = useRef(null);
-  const [playing, setPlaying] = useState(false);
+  const [previewing, setPreviewing] = useState(false);
   const isVideo = isVideoPodcast(clip);
   const hidden = clip.status === "hidden";
 
-  const play = () => {
+  const startPreview = () => {
     const el = ref.current;
     if (!el) return;
-    el.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+    el.play().then(() => setPreviewing(true)).catch(() => setPreviewing(false));
   };
-  const pause = () => {
-    ref.current?.pause();
-    setPlaying(false);
+  const stopPreview = () => {
+    const el = ref.current;
+    if (el) {
+      el.pause();
+      el.currentTime = 0;
+    }
+    setPreviewing(false);
   };
 
   return (
-    <article className={`flex flex-col overflow-hidden rounded-2xl bg-white shadow-card ${hidden ? "outline-dashed outline-1 outline-zinc-300" : ""}`}>
-      <div className="group relative aspect-[9/16] overflow-hidden bg-black" onMouseEnter={isVideo ? play : undefined} onMouseLeave={pause}>
+    <article className={`flex flex-col overflow-hidden rounded-2xl bg-white shadow-card transition hover:shadow-lift ${hidden ? "outline-dashed outline-1 outline-zinc-300" : ""}`}>
+      <div className="group relative aspect-[9/16] overflow-hidden bg-black" onMouseEnter={isVideo ? startPreview : undefined} onMouseLeave={isVideo ? stopPreview : undefined}>
         {isVideo ? (
           <video ref={ref} src={clip.podcast_url} poster={clip.coverImage} preload="none" muted loop playsInline className="h-full w-full object-cover" />
         ) : (
-          <>
-            <img src={clip.coverImage} alt="" loading="lazy" className="h-full w-full object-cover" />
-            <audio ref={ref} src={clip.podcast_url} preload="none" onEnded={() => setPlaying(false)} />
-          </>
+          <img src={clip.coverImage} alt="" loading="lazy" className="h-full w-full object-cover" />
         )}
         <button
           type="button"
-          onClick={() => (playing ? pause() : play())}
-          aria-label={playing ? `Pause ${clip.title}` : `Play ${clip.title}`}
-          className="absolute inset-0 border-0 bg-transparent bg-gradient-to-t from-black/80 via-transparent to-black/30 p-0"
+          onClick={() => {
+            stopPreview();
+            onOpen();
+          }}
+          aria-label={`Play ${clip.title}`}
+          className="absolute inset-0 cursor-pointer border-0 bg-transparent bg-gradient-to-t from-black/85 via-transparent to-black/30 p-0"
         >
-          {!playing && (
-            <span className="absolute left-1/2 top-1/2 grid h-12 w-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-ink">
-              <Play size={20} className="ml-0.5" fill="currentColor" />
-            </span>
-          )}
-          {playing && (
-            <span className="absolute left-1/2 top-1/2 grid h-12 w-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-black/50 text-white opacity-0 transition group-hover:opacity-100">
-              <Pause size={18} />
-            </span>
-          )}
+          <span
+            className={`absolute left-1/2 top-1/2 grid h-12 w-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-ink shadow-lg transition group-hover:scale-110 ${previewing ? "opacity-0 group-hover:opacity-100" : ""}`}
+          >
+            <Play size={20} className="ml-0.5" fill="currentColor" />
+          </span>
         </button>
-        <div className="pointer-events-none absolute inset-x-2.5 top-2.5 flex items-center justify-between">
+        <div className="pointer-events-none absolute inset-x-2.5 top-2.5 flex items-center justify-between gap-2">
           <span className="inline-flex items-center gap-1 rounded-md bg-black/60 px-1.5 py-0.5 text-[11px] font-medium tabular-nums text-white">
             {!isVideo && <AudioLines size={11} />}
             {podcastDurationLabel(clip)}
           </span>
-          {hidden && (
-            <span className="inline-flex items-center gap-1 rounded-md bg-black/75 px-2 py-0.5 text-[11px] font-medium text-white">
-              <EyeOff size={11} /> Hidden
+          {previewing ? (
+            <span className="inline-flex items-center gap-1 rounded-md bg-black/60 px-1.5 py-0.5 text-[11px] font-medium text-white">
+              <VolumeX size={11} /> Preview · click for sound
             </span>
+          ) : (
+            hidden && (
+              <span className="inline-flex items-center gap-1 rounded-md bg-black/75 px-2 py-0.5 text-[11px] font-medium text-white">
+                <EyeOff size={11} /> Hidden
+              </span>
+            )
           )}
         </div>
         <div className="pointer-events-none absolute inset-x-3 bottom-3">
           <p className="line-clamp-2 text-sm font-semibold text-white">{clip.title}</p>
-          <p className="mt-1 flex items-center gap-2 text-xs text-white/75">
-            <span className="truncate">{clip.creator?.name || clip.station?.name || "Station"}</span>
-            <span className="inline-flex shrink-0 items-center gap-1 tabular-nums">
-              <Eye size={12} /> {formatNumber(clip.totalView)}
-            </span>
+          <p className="mt-0.5 truncate text-xs text-white/75">{clip.creator?.name || clip.station?.name || "Station"}</p>
+          <p className="mt-1.5 flex items-center gap-3 text-xs text-white/90">
+            <CardStat icon={Eye} value={clip.totalView} label="views" />
+            <CardStat icon={Heart} value={clip.totalLikes} label="likes" />
+            <CardStat icon={MessageCircle} value={clip.totalComments} label="comments" />
           </p>
         </div>
       </div>
@@ -87,14 +104,20 @@ const ClipCard = ({ clip, onEdit }) => {
   );
 };
 
-ClipCard.propTypes = { clip: PropTypes.object.isRequired, onEdit: PropTypes.func.isRequired };
+ClipCard.propTypes = { clip: PropTypes.object.isRequired, onOpen: PropTypes.func.isRequired, onEdit: PropTypes.func.isRequired };
 
 const ReelsPage = () => {
   const list = useListParams({ limit: 12, filters: { type: "clip", includeHidden: true, status: undefined } });
   const { data, isLoading, isFetching, error, refetch } = useGetPodcastsQuery(list.queryArgs);
   const [form, setForm] = useState({ open: false, podcast: undefined });
+  const [playing, setPlaying] = useState(null); // index of the clip open in the player
   const clips = data?.result ?? [];
   const openCreate = () => setForm({ open: true, podcast: undefined });
+  const openEdit = (podcast) => {
+    setPlaying(null);
+    setForm({ open: true, podcast });
+  };
+  const closePlayer = useCallback(() => setPlaying(null), []);
 
   return (
     <>
@@ -139,8 +162,8 @@ const ReelsPage = () => {
         </Surface>
       ) : (
         <div className={`grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 ${isFetching ? "opacity-70" : ""}`}>
-          {clips.map((c) => (
-            <ClipCard key={c._id} clip={c} onEdit={(podcast) => setForm({ open: true, podcast })} />
+          {clips.map((c, i) => (
+            <ClipCard key={c._id} clip={c} onOpen={() => setPlaying(i)} onEdit={openEdit} />
           ))}
         </div>
       )}
@@ -148,6 +171,10 @@ const ReelsPage = () => {
         <div className="mt-8 flex justify-center">
           <Pagination current={list.page} pageSize={list.limit} total={data.meta.total} onChange={list.onPageChange} showSizeChanger={false} />
         </div>
+      )}
+
+      {playing !== null && (
+        <ClipPlayerModal clips={clips} index={playing} onIndexChange={setPlaying} onClose={closePlayer} onEdit={openEdit} />
       )}
 
       <PodcastFormModal
