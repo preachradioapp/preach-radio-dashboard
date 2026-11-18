@@ -7,6 +7,8 @@ import UserCell from "../../components/ui/UserCell";
 import { formatDate, formatNumber, podcastDurationLabel } from "../../lib/format";
 import { isVideoPodcast } from "../../lib/media";
 import PodcastActions from "./PodcastActions";
+import MediaPlayer from "../../components/MediaPlayer";
+import { ProcessingNotice } from "../../components/ProcessingBadge";
 import CoverImage from "../../components/ui/CoverImage";
 
 const Stat = ({ icon: Icon, label, value, loading }) => (
@@ -86,19 +88,19 @@ const ClipPlayerModal = ({ clips, index, onIndexChange, onClose, onEdit }) => {
         {/* Player */}
         <div className="flex shrink-0 items-center justify-center bg-black md:w-[min(46vh,428px)]">
           {isVideo ? (
-            <video
+            <MediaPlayer
               key={clip._id}
+              kind="video"
               src={clip.podcast_url}
-              poster={clip.coverImage || undefined}
-              controls
+              hlsUrl={clip.hlsUrl || undefined}
+              poster={clip.coverImage}
               autoPlay
-              playsInline
-              className="max-h-[60vh] w-full object-contain md:h-full md:max-h-none"
+              className="max-h-[60vh] w-full bg-black object-contain md:h-full md:max-h-none"
             />
           ) : (
             <div key={clip._id} className="flex w-full flex-col items-center gap-5 p-6">
               <CoverImage src={clip.coverImage} iconSize={48} className="aspect-square w-full max-w-[300px] rounded-xl object-cover" />
-              <audio src={clip.podcast_url} controls autoPlay className="w-full" />
+              <MediaPlayer kind="audio" src={clip.podcast_url} hlsUrl={clip.hlsUrl || undefined} autoPlay className="w-full" />
             </div>
           )}
         </div>
@@ -143,6 +145,8 @@ const ClipPlayerModal = ({ clips, index, onIndexChange, onClose, onEdit }) => {
               <Stat icon={MessageCircle} label="Comments" value={clip.totalComments} loading={counting} />
               <Stat icon={Bookmark} label="Saves" value={clip.totalBookmarks} loading={counting} />
             </div>
+
+            <ProcessingNotice podcast={clip} />
 
             {clip.description && <p className="whitespace-pre-line text-sm leading-relaxed text-ink-soft">{clip.description}</p>}
 

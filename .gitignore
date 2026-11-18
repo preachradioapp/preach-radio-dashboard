@@ -27,8 +27,6 @@ temp_interactive_push.bat
 .gitignore
 
 # Environment (never commit real values; see .env.example)
-.env
-.env.*
 !.env.example
 
 # Test output
