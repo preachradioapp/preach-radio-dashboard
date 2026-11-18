@@ -195,7 +195,7 @@ const PodcastFormModal = ({ open, podcast, onClose, type: pageType }) => {
             </Form.Item>
           </div>
 
-          <div className="grid gap-x-5 md:grid-cols-[1fr_220px]">
+          <div className="grid gap-x-5 md:grid-cols-[minmax(0,1fr)_220px]">
             <Form.Item noStyle shouldUpdate={(a, b) => a.kind !== b.kind || a.media !== b.media || a.type !== b.type}>
               {({ getFieldValue }) => {
                 const isClip = getFieldValue("type") === "clip";
